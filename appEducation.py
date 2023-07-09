@@ -14,14 +14,13 @@ df=pd.read_csv('with_iso_alpha_education.csv')
 
 app.layout = html.Div([
 
-    html.H1("Web Application Dashboards with Dash", style={'text-align': 'center'}),
+    html.H1("How Have Global Education Levels Changed Since 1870?", style={'text-align': 'center'}),
 
     dcc.Dropdown(id="slct_view",
                  options=[
                      {"label": "Completed Primary Education", "value": "completed_primary"},
                      {"label": "Completed Secondary Education", "value": "completed_secondary"},
                      {"label": "Completed Teritary Education", "value":"completed_tertiary"},
-                     {"label": "Population (Thousands)", "value": "population_1000s"},
                      {"label": "Average Years Total Schooling", "value": "avg_years_total_schooling" }],
                  multi=False,
                  value="avg_years_total_schooling",
@@ -35,15 +34,16 @@ app.layout = html.Div([
 
 ])
 
-# ------------------------------------------------------------------------------
-# Connect the Plotly graphs with Dash Components
+
+# Callback
+# Connect dropdown (input) to visuals (output)
 @app.callback(
     [Output(component_id='output_container', component_property='children'),
      Output(component_id='education_map', component_property='figure')],
     [Input(component_id='slct_view', component_property='value')] # must be value not label
 )
 def update_graph(option_slctd):
-    # retrieves information from Input to select data from df
+    # update the visual based on the dropdown option selected
 
 
     app.logger.info(option_slctd)
@@ -52,11 +52,7 @@ def update_graph(option_slctd):
 
     container = "You are viewing: {}".format(option_slctd)
 
-    # dff = df.copy()
-    # dff = dff[['year', option_slctd]]
-    # print(dff.head())
-
-    # // Plotly Express
+    # the plotly vis
     fig = px.choropleth(
                         data_frame=df,
                         animation_frame='year',
@@ -72,4 +68,4 @@ def update_graph(option_slctd):
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
