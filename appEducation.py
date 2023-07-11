@@ -28,7 +28,7 @@ app.layout = html.Div([
                      {"label": "Average Years Total Schooling", "value": "avg_years_total_schooling" }],
                  multi=False,
                  value="avg_years_total_schooling",
-                 style={'width': "40%"}
+                 style={'width': "60%"}
                  ),
 
     html.Div(id='output_container', children=[]),
