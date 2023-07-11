@@ -1,21 +1,25 @@
 import pandas as pd
 import plotly.express as px  # (version 4.7.0 or higher)
 import plotly.graph_objects as go
-from dash import Dash, dcc, html, Input, Output  # pip install dash (version 2.0.0 or higher)
+from dash import Dash, dcc, html, Input, Output  # dash (version 2.0.0 or higher)
 
-
+# Create an instance of the Dash application
 app = Dash(__name__)
+
+# Load in data
+df=pd.read_csv('with_iso_alpha_education.csv')
+print(df.head())
 
 
 # ------------------------------------------------------------------------------
 # App layout
 
-df=pd.read_csv('with_iso_alpha_education.csv')
 
 app.layout = html.Div([
 
     html.H1("How Have Global Education Levels Changed Since 1870?", style={'text-align': 'center'}),
 
+    # Dash Core Component. Value for each option corresponds to a column in the DataFrame.
     dcc.Dropdown(id="slct_view",
                  options=[
                      {"label": "Completed Primary Education", "value": "completed_primary"},
@@ -24,39 +28,43 @@ app.layout = html.Div([
                      {"label": "Average Years Total Schooling", "value": "avg_years_total_schooling" }],
                  multi=False,
                  value="avg_years_total_schooling",
-                 style={'width': "40%"}
+                 style={'width': "60%"}
                  ),
 
     html.Div(id='output_container', children=[]),
+    
     html.Br(),
 
+    # Dash Core Component
     dcc.Graph(id='education_map', figure={})
 
 ])
 
+# ------------------------------------------------------------------------------
+# Callbacks
 
-# Callback
-# Connect dropdown (input) to visuals (output)
+# Callback decorator to connect dropdown (input) to visuals (output).
+# Component_id links the functionality to the relevant components in the layout.
+#
 @app.callback(
     [Output(component_id='output_container', component_property='children'),
      Output(component_id='education_map', component_property='figure')],
-    [Input(component_id='slct_view', component_property='value')] # must be value not label
+    [Input(component_id='slct_view', component_property='value')] 
 )
+
 def update_graph(option_slctd):
-    # update the visual based on the dropdown option selected
-
-
-    app.logger.info(option_slctd)
-    print(option_slctd)
-    print(type(option_slctd))
+    """
+    Creates a choropleth map of the world with the selected education metric.
+    This funciton will get called whenever the dropdown menu is changed.
+    """
 
     container = "You are viewing: {}".format(option_slctd)
 
-    # the plotly vis
+   # Create the dynamic Plotly Express figure 
     fig = px.choropleth(
                         data_frame=df,
                         animation_frame='year',
-                        color=option_slctd, 
+                        color=option_slctd, #option_slct variable is passed from dropdown into this function
                         locations="iso_alpha",
                         color_continuous_scale=px.colors.diverging.Geyser_r,
                         hover_data= ['country'],
